@@ -1,7 +1,7 @@
 {
-  "name": "deposit-money-backend",
-  "version": "1.0.0",
-  "description": "Paystack payment backend for Deposit Money",
+  "name": "deposit-money-unified",
+  "version": "1.1.0",
+  "description": "Unified Deposit Money frontend + backend for Render",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"

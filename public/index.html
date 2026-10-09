@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Deposit Money — Fast &amp; Secure M-Pesa &amp; Card Payments</title>
+  <meta name="description" content="Send money in seconds. Secure M-Pesa and card payments powered by Paystack." />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='24' fill='%23011b33'/%3E%3Cpath d='M30 62 L45 45 L57 56 L72 36' stroke='%2300c3f7' stroke-width='9' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="assets/css/style.css" />
+</head>
+<body>
+  <!-- Animated Paystack-style background -->
+  <div class="bg" aria-hidden="true">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+    <div class="grid-overlay"></div>
+  </div>
+
+  <!-- Navbar -->
+  <nav class="nav">
+    <a class="brand" href="/">
+      <span class="brand-mark">
+        <svg viewBox="0 0 100 100" width="26" height="26" aria-hidden="true">
+          <rect width="100" height="100" rx="24" fill="#00c3f7"></rect>
+          <path d="M30 62 L45 45 L57 56 L72 36" stroke="#011b33" stroke-width="9" fill="none" stroke-linecap="round" stroke-linejoin="round"></path>
+        </svg>
+      </span>
+      <span class="brand-name">Deposit<em>Money</em></span>
+    </a>
+    <div class="nav-right">
+      <span class="server-pill" id="serverPill"><span class="dot" id="serverDot"></span><span id="serverText">Connecting…</span></span>
+      <span class="secure-pill">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 2l7 3v6c0 5-3.5 8.5-7 10-3.5-1.5-7-5-7-10V5l7-3z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M9 12l2 2 4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Secured by Paystack
+      </span>
+    </div>
+  </nav>
+
+  <main class="wrap">
+    <!-- Hero copy -->
+    <section class="hero">
+      <div class="badge-anim">⚡ Instant M-Pesa STK Push &amp; Card Payments</div>
+      <h1>Send money<br /><span class="grad">in seconds.</span></h1>
+      <p class="sub">Pick an amount, choose M-Pesa or Card, and approve on the secure prompt. No PIN or card details are ever typed on this website.</p>
+      <ul class="ticks">
+        <li><span class="tick">✓</span> Bank-grade 256-bit encryption</li>
+        <li><span class="tick">✓</span> M-Pesa PIN entered only on the phone's prompt</li>
+        <li><span class="tick">✓</span> Cards processed on Paystack's PCI-DSS checkout</li>
+        <li><span class="tick">✓</span> Instant confirmation &amp; receipt reference</li>
+      </ul>
+      <div class="logos">
+        <span class="logo-chip">Paystack</span>
+        <span class="logo-chip">M-PESA</span>
+        <span class="logo-chip">VISA</span>
+        <span class="logo-chip">Mastercard</span>
+        <span class="logo-chip">PCI-DSS</span>
+      </div>
+    </section>
+
+    <!-- Payment card -->
+    <section class="card-holder">
+      <div class="card" id="card">
+
+        <!-- SCREEN 1 : FORM -->
+        <div class="screen active" id="screenForm">
+          <h2 class="card-title">Make a payment</h2>
+          <p class="card-sub">Choose or enter an amount in KES</p>
+
+          <div class="amount-display">
+            <span class="kes">KES</span>
+            <input id="amountInput" type="number" min="5" max="1000000" inputmode="numeric" placeholder="0" autocomplete="off" />
+          </div>
+
+          <div class="chips" id="chips">
+            <button type="button" class="chip" data-amt="100">100</button>
+            <button type="button" class="chip" data-amt="250">250</button>
+            <button type="button" class="chip" data-amt="500">500</button>
+            <button type="button" class="chip" data-amt="1000">1,000</button>
+            <button type="button" class="chip" data-amt="2500">2,500</button>
+            <button type="button" class="chip" data-amt="5000">5,000</button>
+          </div>
+
+          <label class="lbl" for="nameInput">Your name <span class="opt">(optional)</span></label>
+          <input class="inp" id="nameInput" type="text" placeholder="e.g. Brian Otieno" autocomplete="name" />
+
+          <!-- Payment method tabs -->
+          <div class="method-tabs" role="tablist">
+            <button type="button" class="mtab active" id="tabMpesa" role="tab">📱 M-Pesa</button>
+            <button type="button" class="mtab" id="tabCard" role="tab">💳 Card</button>
+          </div>
+
+          <!-- M-Pesa pane -->
+          <div class="method-pane active" id="paneMpesa">
+            <label class="lbl" for="phoneInput">M-Pesa phone number</label>
+            <div class="phone-wrap">
+              <span class="prefix">+254</span>
+              <input class="inp phone" id="phoneInput" type="tel" inputmode="tel" placeholder="M-Pesa number" autocomplete="tel" />
+            </div>
+            <p class="hint">Accepted formats: 07…, 01…, 7…, 1…, +254… or 254…</p>
+          </div>
+
+          <!-- Card pane -->
+          <div class="method-pane" id="paneCard">
+            <label class="lbl" for="emailInput">Email address <span class="opt">(for your receipt)</span></label>
+            <input class="inp" id="emailInput" type="email" placeholder="you@example.com" autocomplete="email" />
+            <p class="hint">Visa, Mastercard &amp; Verve accepted. Card details are entered on Paystack's secure checkout — never here.</p>
+          </div>
+
+          <div class="err" id="formError"></div>
+
+          <button class="pay-btn" id="payBtn">
+            <span class="pay-btn-text" id="payBtnText">Pay Securely</span>
+            <span class="pay-btn-arrow">→</span>
+          </button>
+
+          <p class="fine" id="fineMpesa">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="4" y="10" width="16" height="10" rx="2" stroke="currentColor" stroke-width="2"/><path d="M8 10V7a4 4 0 118 0v3" stroke="currentColor" stroke-width="2"/></svg>
+            You'll approve with your M-Pesa PIN <b>on your phone</b> — never here.
+          </p>
+          <p class="fine" id="fineCard" style="display:none">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="4" y="10" width="16" height="10" rx="2" stroke="currentColor" stroke-width="2"/><path d="M8 10V7a4 4 0 118 0v3" stroke="currentColor" stroke-width="2"/></svg>
+            Card details are entered only on <b>Paystack's secure checkout</b> — never here.
+          </p>
+        </div>
+
+        <!-- SCREEN 2 : PROCESSING / WAITING -->
+        <div class="screen" id="screenProcessing">
+          <div class="phone-anim">
+            <div class="phone-body">
+              <div class="phone-notch"></div>
+              <div class="push-banner">
+                <div class="push-icon">M</div>
+                <div>
+                  <b id="pushTitle">M-PESA Request</b>
+                  <p id="pushText">Enter your M-Pesa PIN to pay</p>
+                </div>
+              </div>
+              <div class="pin-dots"><i></i><i></i><i></i><i></i></div>
+            </div>
+            <div class="ring r1"></div>
+            <div class="ring r2"></div>
+          </div>
+          <h2 class="card-title center" id="procTitle">Check your phone</h2>
+          <p class="card-sub center" id="procLead">An M-Pesa prompt was sent to your phone.</p>
+          <div class="timer-wrap">
+            <div class="timer-bar"><div class="timer-fill" id="timerFill"></div></div>
+            <span class="timer-num" id="timerNum">90s</span>
+          </div>
+          <p class="waiting"><span class="spin"></span> Waiting for confirmation…</p>
+          <button class="ghost-btn" id="cancelBtn">Cancel &amp; go back</button>
+        </div>
+
+        <!-- SCREEN 3 : SUCCESS -->
+        <div class="screen" id="screenSuccess">
+          <div class="check-wrap">
+            <svg class="check" viewBox="0 0 100 100" aria-hidden="true">
+              <circle class="check-circle" cx="50" cy="50" r="46" />
+              <path class="check-mark" d="M30 52 L45 66 L72 36" />
+            </svg>
+          </div>
+          <h2 class="card-title center grad-text">Payment received!</h2>
+          <p class="card-sub center">Thank you — your payment was successful.</p>
+          <div class="receipt">
+            <div><span>Amount</span><b id="okAmount">—</b></div>
+            <div><span id="okContactLabel">Phone</span><b id="okPhone">—</b></div>
+            <div><span>Reference</span><b id="okRef" class="mono">—</b></div>
+          </div>
+          <button class="pay-btn" id="againBtn"><span class="pay-btn-text">Make another payment</span></button>
+        </div>
+
+        <!-- SCREEN 4 : FAILED -->
+        <div class="screen" id="screenFailed">
+          <div class="fail-icon">✕</div>
+          <h2 class="card-title center">Payment not completed</h2>
+          <p class="card-sub center" id="failReason">The transaction was cancelled or timed out.</p>
+          <button class="pay-btn" id="retryBtn"><span class="pay-btn-text">Try again</span></button>
+          <button class="ghost-btn" id="backBtn">Back to form</button>
+        </div>
+
+      </div>
+      <p class="powered">Powered by <b>Paystack</b> · <a href="/xxadmin">Admin</a></p>
+    </section>
+  </main>
+
+  <footer class="foot">© <span id="yr"></span> Deposit Money · All transactions are processed securely by Paystack.</footer>
+
+  <canvas id="confetti"></canvas>
+  <script src="https://js.paystack.co/v2/inline.js"></script>
+  <script src="assets/js/app.js"></script>
+</body>
+</html>

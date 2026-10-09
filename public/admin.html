@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex,nofollow" />
+  <title>Admin — Deposit Money</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='24' fill='%23011b33'/%3E%3Cpath d='M30 62 L45 45 L57 56 L72 36' stroke='%2300c3f7' stroke-width='9' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="assets/css/style.css" />
+</head>
+<body>
+  <div class="bg" aria-hidden="true">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="grid-overlay"></div>
+  </div>
+
+  <div class="admin-login" id="loginView">
+    <h1>🔐 Admin Login</h1>
+    <p class="card-sub">Deposit Money dashboard</p>
+    <label class="lbl" for="pw">Password</label>
+    <input class="inp" id="pw" type="password" placeholder="Enter admin password" />
+    <div class="err" id="loginErr"></div>
+    <button class="pay-btn" id="loginBtn"><span class="pay-btn-text">Sign in</span></button>
+    <p class="fine" style="margin-top:16px"><a href="/" style="color:#5b7290">← Back to payment page</a></p>
+  </div>
+
+  <div class="admin-wrap" id="dashView" style="display:none">
+    <div class="admin-top">
+      <h1>Deposit<em>Money</em> · Admin</h1>
+      <div style="display:flex;gap:10px">
+        <button class="small-btn" id="refreshBtn">↻ Refresh</button>
+        <button class="small-btn" id="logoutBtn">Log out</button>
+      </div>
+    </div>
+
+    <div class="stats-grid">
+      <div class="stat green"><small>Total collected</small><b id="stTotal">KES 0</b></div>
+      <div class="stat"><small>Collected today</small><b id="stToday">KES 0</b></div>
+      <div class="stat"><small>Successful payments</small><b id="stCount">0</b></div>
+      <div class="stat"><small>Pending</small><b id="stPending">0</b></div>
+    </div>
+
+    <div class="tbl-card">
+      <div class="tbl-head">
+        <h2>Recent transactions</h2>
+        <span class="card-sub" style="margin:0" id="txMeta"></span>
+      </div>
+      <div class="tbl-scroll">
+        <table>
+          <thead>
+            <tr><th>Date</th><th>Name</th><th>Phone / Email</th><th>Amount</th><th>Status</th><th>Reference</th></tr>
+          </thead>
+          <tbody id="txBody"></tbody>
+        </table>
+        <div class="empty" id="txEmpty" style="display:none">No transactions yet. Share your payment link to get started 🚀</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const BACKEND_URL = '';
+    const TOKEN_KEY = 'dm_admin_token';
+    const $ = (id) => document.getElementById(id);
+    const fmt = (n) => 'KES ' + Number(n || 0).toLocaleString('en-KE');
+
+    async function login() {
+      $('loginErr').textContent = '';
+      const btn = $('loginBtn');
+      btn.disabled = true;
+      btn.querySelector('.pay-btn-text').textContent = 'Signing in…';
+      try {
+        const r = await fetch(BACKEND_URL + '/api/admin/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ password: $('pw').value }),
+        });
+        const d = await r.json();
+        if (!r.ok || !d.success) throw new Error(d.message || 'Login failed.');
+        sessionStorage.setItem(TOKEN_KEY, d.token);
+        showDash();
+      } catch (e) {
+        $('loginErr').textContent = e.message;
+      } finally {
+        btn.disabled = false;
+        btn.querySelector('.pay-btn-text').textContent = 'Sign in';
+      }
+    }
+
+    function showDash() {
+      $('loginView').style.display = 'none';
+      $('dashView').style.display = 'block';
+      loadAll();
+    }
+
+    async function api(path) {
+      const r = await fetch(BACKEND_URL + path, {
+        headers: { 'x-admin-token': sessionStorage.getItem(TOKEN_KEY) || '' },
+      });
+      if (r.status === 401) { logout(); throw new Error('Session expired.'); }
+      return r.json();
+    }
+
+    async function loadAll() {
+      try {
+        const [stats, txs] = await Promise.all([api('/api/admin/stats'), api('/api/admin/transactions')]);
+        $('stTotal').textContent = fmt(stats.stats.totalCollected);
+        $('stToday').textContent = fmt(stats.stats.todayCollected);
+        $('stCount').textContent = stats.stats.totalCount;
+        $('stPending').textContent = stats.stats.pending;
+
+        const list = txs.transactions || [];
+        $('txMeta').textContent = list.length + ' record' + (list.length === 1 ? '' : 's');
+        $('txEmpty').style.display = list.length ? 'none' : 'block';
+        $('txBody').innerHTML = list.map((t) => {
+          const d = new Date(t.createdAt || Date.now());
+          const st = String(t.status || 'pending').toLowerCase();
+          const contact = t.phone ? ('+' + t.phone) : (t.customerEmail || '—');
+          return `<tr>
+            <td>${d.toLocaleString('en-KE', { dateStyle: 'medium', timeStyle: 'short' })}</td>
+            <td>${escapeHtml(t.name || '—')}</td>
+            <td>${escapeHtml(contact)}</td>
+            <td><b>${fmt(t.amount)}</b></td>
+            <td><span class="st ${st}">${st.replace(/_/g, ' ')}</span></td>
+            <td class="mono" style="font-family:ui-monospace,monospace;font-size:11.5px">${t.reference || '—'}</td>
+          </tr>`;
+        }).join('');
+      } catch (e) {}
+    }
+
+    function escapeHtml(s) {
+      return String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+    }
+
+    function logout() {
+      sessionStorage.removeItem(TOKEN_KEY);
+      $('dashView').style.display = 'none';
+      $('loginView').style.display = 'block';
+    }
+
+    $('loginBtn').addEventListener('click', login);
+    $('pw').addEventListener('keydown', (e) => { if (e.key === 'Enter') login(); });
+    $('refreshBtn').addEventListener('click', loadAll);
+    $('logoutBtn').addEventListener('click', logout);
+
+    if (sessionStorage.getItem(TOKEN_KEY)) showDash();
+  </script>
+</body>
+</html>
